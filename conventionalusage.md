@@ -143,3 +143,32 @@ p T& & à T&, T& && à T&, T&& & à T&, T&& && à T&&
 ■ T&& 是转发引用（仅当其出现在函数模板的参数或变量声明中时）
 ■ std::move(x) 把 x 转换成右值引用
 ■ std::forward<T>(x) 保持 x 的引用类型
+  
+## std::forward 的定义
+template <class _Tp>
+inline _Tp&&
+forward(typename remove_reference<_Tp>::type& __t) noexcept
+{
+return static_cast<_Tp&&>(__t);
+}
+template <class _Tp>
+inline _Tp&&
+forward(typename remove_reference<_Tp>::type&& __t) noexcept
+{
+static_assert(!is_lvalue_reference<_Tp>::value,
+"can not forward an rvalue as an lvalue");
+return static_cast<_Tp&&>(__t);
+}
+  
+## forward 使用示例
+template <typename T>
+void bar(T&& s)
+{
+foo(std::forward<T>(s));
+}
+int main()
+{
+circle temp;
+bar(temp);
+bar(circle());
+}
