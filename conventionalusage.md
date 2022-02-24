@@ -172,3 +172,28 @@ circle temp;
 bar(temp);
 bar(circle());
 }
+
+## 临时对象的生命周期
+class result {
+public:
+result() { puts("result()"); }
+~result() { puts("~result()"); }
+};
+result process_shape(const shape&, const shape&);
+process_shape(circle(), triangle());
+// circle、triangle 和 result 对象都在上⼀语句执⾏完成后被销毁
+## 生命期延长规则
+■ 如果一个 prvalue 被绑定到一个引用上，它的生命周期则会延长到跟这个引用变
+量一样长。
+result&& r = process_shape(circle(), triangle());
+■ 如果是 xvalue 则不能延长！
+result&& r = std::move(process_shape(circle(), triangle()));
+  
+  
+## C++ 对象的自动生命周期
+1. 后创建的先析构
+2. 全局对象和静态对象在进入 main 之前创建
+3. 函数静态对象在第一次执行到声明语句时创建
+4. 函数自动对象在定义时创建，到定义所在的“}”即析构
+5. 临时对象在当前语句执行完成后即析构
+p 除非赋值给引用变量而延长生命期
